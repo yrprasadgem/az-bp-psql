@@ -1,0 +1,39 @@
+# TF
+# TF plan and push and apply 
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  - non-prod-01-stg
+
+resources:
+  - repo: self
+
+pool:
+  devops-terraform-agent
+
+steps:
+
+  - task: CmdLine@2
+    displayName: Terraform Version
+    inputs:
+      script: 'terraform version'
+
+  - task: CmdLine@2
+    displayName: Terraform Init Delete
+    inputs:
+      script: 'rm -rf .terraform || true'
+
+  - task: CmdLine@2
+    displayName: Terraform Init
+    inputs:
+      script: 'source /home/contouradmin/terraform/non-prod-stg-01/init-terraform-non-prod-stg-01 && terraform init'
+
+  - task: CmdLine@2
+    displayName: Terraform Plan
+    inputs:
+      script: 'source /home/contouradmin/terraform/non-prod-stg-01/init-terraform-non-prod-stg-01 && terraform plan -out=tfplan'
+
+  - task: CmdLine@2
+    displayName: Terraform Apply
+    inputs:
+      script: 'source /home/contouradmin/terraform/non-prod-stg-01/init-terraform-non-prod-stg-01 && terraform apply tfplan'
